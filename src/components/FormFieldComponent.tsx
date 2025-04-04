@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/form'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
 
 interface FormFieldProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -54,6 +55,8 @@ const FormFieldComponent = ({
                   </FormItem>
                 ))}
               </RadioGroup>
+            ) : type === 'checkbox' ? (
+              <Switch checked={field.value} onCheckedChange={field.onChange} />
             ) : (
               <Input placeholder={placeholder} type={type} {...field} />
             )}

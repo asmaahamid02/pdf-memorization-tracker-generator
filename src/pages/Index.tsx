@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-
 import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
 import Layout from '@/components/Layout'
@@ -10,8 +9,8 @@ import FormFieldComponent from '@/components/FormFieldComponent'
 import { toast } from 'sonner'
 import { useState } from 'react'
 import jsPDF from 'jspdf'
-import PDFPreview from '../components/PDFPreview'
-import { generateSeparateAyahsPDF } from '@/utils/ayahPdfGenerator'
+import PDFPreview from '@/components/PDFPreview'
+import { generatePDF } from '@/utils/PdfGenerator'
 
 const formSchema = z
   .object({
@@ -23,23 +22,27 @@ const formSchema = z
       .max(20, {
         message: 'Title must be at most 20 characters.',
       }),
-    startAyah: z.coerce.number().min(1).max(300),
-    lastAyah: z.coerce.number().min(1).max(300),
+    startNumber: z.coerce.number().min(1).max(300), //coerce is used to convert string to number (form handle number input as string)
+    lastNumber: z.coerce.number().min(1).max(300),
+    isGrouped: z.boolean().default(false).optional(),
+    countPerGroup: z.coerce.number().min(1),
     repetitions: z.coerce.number().min(1),
     orientation: z.enum(['portrait', 'landscape']),
   })
-  .refine((data) => data.startAyah < data.lastAyah, {
-    message: 'Start Ayah must be less than Last Ayah.',
-    path: ['startAyah'], // Error will be associated with startAyah
+  .refine((data) => data.startNumber < data.lastNumber, {
+    message: 'Start Number must be less than Last Number.',
+    path: ['startNumber'], // Error will be associated with startNumber
   })
 
-const SeparateAyahsPage = () => {
+const Index = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: '',
-      startAyah: 1,
-      lastAyah: 10,
+      startNumber: 1,
+      lastNumber: 10,
+      isGrouped: false,
+      countPerGroup: 1,
       repetitions: 5,
       orientation: 'portrait',
     },
@@ -50,13 +53,13 @@ const SeparateAyahsPage = () => {
     console.log(values)
 
     try {
-      const doc = generateSeparateAyahsPDF(values)
+      const doc = generatePDF(values)
       setPdfDoc(doc)
 
       toast.success('PDF generated successfully')
     } catch (e) {
-      console.error('Error generating Separate Ayahs PDF:', e)
-      toast('Error generating Separate Ayahs PDF')
+      console.error('Error generating PDF:', e)
+      toast('Error generating PDF')
     }
   }
 
@@ -64,12 +67,10 @@ const SeparateAyahsPage = () => {
     <Layout>
       <div className='container mx-auto grid grid-cols-1 md:grid-cols-2 gap-6'>
         {/* Form */}
-        <div>
+        <div className='w-full md:max-w-2xl'>
           <Card>
             <CardHeader>
-              <CardTitle className='text-2xl'>
-                Separate Ayahs Generator
-              </CardTitle>
+              <CardTitle className='text-2xl'>Generate Custom PDF</CardTitle>
             </CardHeader>
 
             <CardContent>
@@ -86,18 +87,19 @@ const SeparateAyahsPage = () => {
                   />
                   <FormFieldComponent
                     control={form.control}
-                    name='startAyah'
-                    label='Start Ayah'
-                    placeholder='Start Ayah'
+                    name='startNumber'
+                    label='Start Number'
+                    placeholder='Start Number'
                     type='number'
                   />
                   <FormFieldComponent
                     control={form.control}
-                    name='lastAyah'
-                    label='Last Ayah'
-                    placeholder='Last Ayah'
+                    name='lastNumber'
+                    label='Last Number'
+                    placeholder='Last Number'
                     type='number'
                   />
+
                   <FormFieldComponent
                     control={form.control}
                     name='repetitions'
@@ -105,6 +107,22 @@ const SeparateAyahsPage = () => {
                     placeholder='Repetitions'
                     type='number'
                   />
+
+                  <FormFieldComponent
+                    control={form.control}
+                    name='isGrouped'
+                    label='Is Grouped'
+                    type='checkbox'
+                  />
+
+                  <FormFieldComponent
+                    control={form.control}
+                    name='countPerGroup'
+                    label='Count Per Group'
+                    placeholder='Count Per Group'
+                    type='number'
+                  />
+
                   <FormFieldComponent
                     control={form.control}
                     name='orientation'
@@ -126,11 +144,9 @@ const SeparateAyahsPage = () => {
         <div>
           <PDFPreview
             pdfDoc={pdfDoc}
-            fileName={`separate-ayahs-${form.getValues(
-              'title'
-            )}-${form.getValues('startAyah')}-${form.getValues(
-              'lastAyah'
-            )}.pdf`}
+            fileName={`${form.getValues('title')}-${form.getValues(
+              'startNumber'
+            )}-${form.getValues('lastNumber')}.pdf`}
           />
         </div>
       </div>
@@ -138,4 +154,4 @@ const SeparateAyahsPage = () => {
   )
 }
 
-export default SeparateAyahsPage
+export default Index

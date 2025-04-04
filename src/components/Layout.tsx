@@ -6,7 +6,8 @@ const Layout = ({ children }: { children: ReactNode }) => {
   const location = useLocation()
 
   const navItems = [
-    { name: 'Separate Ayahs', path: '/' },
+    { name: 'Home', path: '/' },
+    { name: 'Separate Ayahs', path: '/separate-ayahs' },
     { name: 'Grouped Ayahs', path: '/grouped-ayahs' },
     { name: 'Separate Pages', path: '/separate-pages' },
     { name: 'Grouped Pages', path: '/grouped-pages' },
@@ -22,24 +23,27 @@ const Layout = ({ children }: { children: ReactNode }) => {
         </div>
       </header>
       <div className='flex flex-col md:flex-row flex-1'>
-        <nav className='bg-sidebar border-r border-sidebar-border md:w-1/4 p-4'>
-          <div className='space-y-2'>
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  'block py-2 px-4 rounded-md transition-colors',
-                  location.pathname === item.path
-                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                    : 'hover:text-sidebar-accent-foreground hover:bg-sidebar-accent/35'
-                )}
-              >
-                {item.name}
-              </Link>
-            ))}
-          </div>
-        </nav>
+        {/* Sidebar */}
+        {location.pathname !== '/' && (
+          <nav className='bg-sidebar border-r border-sidebar-border md:w-1/4 p-4'>
+            <div className='space-y-2'>
+              {navItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={cn(
+                    'block py-2 px-4 rounded-md transition-colors',
+                    location.pathname === item.path
+                      ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                      : 'hover:text-sidebar-accent-foreground hover:bg-sidebar-accent/35'
+                  )}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+          </nav>
+        )}
 
         <main className='flex-1 p-6'>{children}</main>
       </div>

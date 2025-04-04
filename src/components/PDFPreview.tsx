@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import jsPDF from 'jspdf'
-import { Button } from './ui/button'
+import { Button } from '@/components/ui/button'
 
 interface PDFPreviewProps {
   pdfDoc: jsPDF | null
@@ -55,7 +55,10 @@ const PDFPreview: FC<PDFPreviewProps> = ({ pdfDoc, fileName }) => {
       </CardContent>
 
       <CardFooter>
-        <Button className='w-full' onClick={handleDownload}>
+        <Button
+          className='w-full bg-accent text-accent-foreground hover:bg-accent/80'
+          onClick={handleDownload}
+        >
           Download PDF
         </Button>
       </CardFooter>

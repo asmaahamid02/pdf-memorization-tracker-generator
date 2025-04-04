@@ -6,36 +6,41 @@ import {
   moveToNewPage,
   containsArabic,
   drawFooter,
-} from './pdfUtils'
+} from '@/utils/pdfUtils'
 
-export interface SeparateAyahsData {
+export interface SeparateData {
   title: string
-  startAyah: number
-  lastAyah: number
+  startNumber: number
+  lastNumber: number
   repetitions: number
   orientation?: 'portrait' | 'landscape'
 }
 
-export interface GroupedAyahsData extends SeparateAyahsData {
-  ayahsPerGroup: number
+export interface GroupedData extends SeparateData {
+  countPerGroup: number
+}
+
+export interface Data extends SeparateData {
+  isGrouped?: boolean
+  countPerGroup: number
 }
 
 const xMargin = 20
 const yMargin = 20
 const circlesStartIncrement = 20
 
-export const generateSeparateAyahsPDF = (data: SeparateAyahsData): jsPDF => {
+export const generateSeparatePDF = (data: SeparateData): jsPDF => {
   const {
     title,
-    startAyah,
-    lastAyah,
+    startNumber,
+    lastNumber,
     repetitions,
     orientation = 'portrait',
   } = data
 
   const doc = new jsPDF({ orientation, unit: 'mm' })
   const pageWidth = doc.internal.pageSize.width
-  const fullTitle = `${title}: ${startAyah} - ${lastAyah}`
+  const fullTitle = `${title}: ${startNumber} - ${lastNumber}`
   const isArabic = containsArabic(fullTitle)
 
   drawTitle(doc, fullTitle)
@@ -43,9 +48,9 @@ export const generateSeparateAyahsPDF = (data: SeparateAyahsData): jsPDF => {
 
   let y = yMargin + 20
 
-  for (let ayah = startAyah; ayah <= lastAyah; ayah++) {
+  for (let i = startNumber; i <= lastNumber; i++) {
     doc.setFontSize(14)
-    doc.text(`${ayah}`, isArabic ? pageWidth - xMargin : xMargin, y, {
+    doc.text(`${i}`, isArabic ? pageWidth - xMargin : xMargin, y, {
       align: isArabic ? 'right' : 'left',
     })
 
@@ -61,14 +66,14 @@ export const generateSeparateAyahsPDF = (data: SeparateAyahsData): jsPDF => {
         circlesStartIncrement,
         repetitions,
         fullTitle,
-        `${ayah}`
+        `${i}`
       ) + 8
 
     drawThinHorizontalLine(doc, circlesY)
     y = circlesY + 10
 
     // Add new page if needed
-    if (y > doc.internal.pageSize.height - yMargin - 10 && ayah < lastAyah) {
+    if (y > doc.internal.pageSize.height - yMargin - 10 && i < lastNumber) {
       y = moveToNewPage(doc, fullTitle)
     }
   }
@@ -76,31 +81,34 @@ export const generateSeparateAyahsPDF = (data: SeparateAyahsData): jsPDF => {
   return doc
 }
 
-export const generateGroupedAyahsPDF = (data: GroupedAyahsData): jsPDF => {
+export const generateGroupedPDF = (data: GroupedData): jsPDF => {
   const {
     title,
-    startAyah,
-    lastAyah,
-    ayahsPerGroup,
+    startNumber,
+    lastNumber,
+    countPerGroup,
     repetitions,
     orientation = 'portrait',
   } = data
 
   const doc = new jsPDF({ orientation, unit: 'mm' })
   const pageWidth = doc.internal.pageSize.width
-  const fullTitle = `${title}: ${startAyah} - ${lastAyah}`
+  const fullTitle = `${title}: ${startNumber} - ${lastNumber}`
   const isArabic = containsArabic(fullTitle)
-  const totalAyahs = lastAyah - startAyah + 1
+  const total = lastNumber - startNumber + 1
 
   drawTitle(doc, fullTitle)
   drawFooter(doc)
 
-  const extraSpace = startAyah > 99 ? 15 : 10
+  const extraSpace = startNumber > 99 ? 15 : 10
   let y = yMargin + 20
-  for (let ayah = 0; ayah < totalAyahs; ayah += ayahsPerGroup) {
-    const groupStartAyah = startAyah + ayah
-    const groupLastAyah = Math.min(groupStartAyah + ayahsPerGroup - 1, lastAyah)
-    const label = `${groupStartAyah} - ${groupLastAyah}`
+  for (let i = 0; i < total; i += countPerGroup) {
+    const groupStartNumber = startNumber + i
+    const groupLastNumber = Math.min(
+      groupStartNumber + countPerGroup - 1,
+      lastNumber
+    )
+    const label = `${groupStartNumber} - ${groupLastNumber}`
 
     doc.setFontSize(14)
     doc.text(label, isArabic ? pageWidth - xMargin : xMargin, y, {
@@ -126,13 +134,39 @@ export const generateGroupedAyahsPDF = (data: GroupedAyahsData): jsPDF => {
     y = circlesY + 10
 
     // Add new page if needed
-    if (
-      y > doc.internal.pageSize.height - yMargin - 10 &&
-      ayah < totalAyahs - 1
-    ) {
+    if (y > doc.internal.pageSize.height - yMargin - 10 && i < total - 1) {
       y = moveToNewPage(doc, fullTitle)
     }
   }
 
   return doc
+}
+
+export const generatePDF = (data: Data): jsPDF => {
+  const {
+    title,
+    startNumber,
+    lastNumber,
+    isGrouped,
+    countPerGroup,
+    repetitions,
+    orientation = 'portrait',
+  } = data
+
+  const pdfData = {
+    title,
+    startNumber: startNumber,
+    lastNumber: lastNumber,
+    repetitions,
+    orientation,
+  }
+
+  if (isGrouped) {
+    return generateGroupedPDF({
+      ...pdfData,
+      countPerGroup: countPerGroup,
+    })
+  }
+
+  return generateSeparatePDF(pdfData)
 }
