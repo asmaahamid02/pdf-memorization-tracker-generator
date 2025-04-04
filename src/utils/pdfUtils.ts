@@ -2,10 +2,12 @@ import { jsPDF } from 'jspdf'
 import { fontStr } from '@/utils/Amiri-Bold.ts'
 
 // Constants
-const xMargin = 20
-const yMargin = 20
+export const xMargin = 20
+export const yMargin = 20
 const spacing = 7
 const circleRadius = 2.5
+const squareSideLength = 5
+export const circlesStartIncrement = 15
 
 // Arabic detection
 export const containsArabic = (text: string): boolean =>
@@ -124,4 +126,91 @@ export const drawCircles = (
   }
 
   return currentY
+}
+export const drawSquares = (
+  doc: jsPDF,
+  x: number,
+  y: number,
+  spaceDecrement: number,
+  count: number,
+  contextTitle: string,
+  rowLabel = ''
+): number => {
+  const pageWidth = doc.internal.pageSize.width
+  const maxWidth = pageWidth - xMargin * 2
+  const isArabic = containsArabic(contextTitle)
+  const squaresPerLine = Math.floor((maxWidth - spaceDecrement) / spacing)
+
+  let currentX = x
+  let currentY = y
+
+  for (let i = 0; i < count; i++) {
+    // New line
+    if (i > 0 && i % squaresPerLine === 0) {
+      currentX = x
+      currentY += spacing
+
+      // Add new page if needed
+      if (currentY > doc.internal.pageSize.height - yMargin - 10) {
+        currentY = moveToNewPage(doc, contextTitle)
+
+        doc.setFontSize(14)
+        doc.text(rowLabel, isArabic ? pageWidth - xMargin : xMargin, currentY, {
+          align: isArabic ? 'right' : 'left',
+        })
+        doc.setFontSize(12)
+        currentY -= 4 //to balance the circles with the text
+      }
+    }
+
+    // doc.circle(currentX, currentY, circleRadius, 'S')
+    doc.rect(currentX, currentY, squareSideLength, squareSideLength, 'S')
+    currentX += isArabic ? -spacing : spacing
+  }
+
+  return currentY + 2
+}
+
+export const drawLabeledSquares = (
+  doc: jsPDF,
+  x: number,
+  y: number,
+  start: number,
+  end: number
+) => {
+  const pageWidth = doc.internal.pageSize.width
+  const pageHeight = doc.internal.pageSize.height
+
+  let currentX = x
+  let currentY = y
+
+  // Use the widest text (end) to calculate square size
+  doc.setFontSize(12)
+  const YSideLength = doc.getTextWidth(`${end}`) // add padding inside square
+  const XSideLength = YSideLength + 5
+
+  for (let i = start; i <= end; i++) {
+    // Wrap to next line if necessary
+    if (currentX + XSideLength > pageWidth - xMargin) {
+      currentX = x
+      currentY += YSideLength
+
+      // Add new page if needed
+      if (currentY + YSideLength > pageHeight - yMargin) {
+        currentY = moveToNewPage(doc, `${start} - ${end}`)
+      }
+    }
+
+    // Draw text inside square
+    doc.text(`${i}`, currentX + XSideLength / 2, currentY + YSideLength / 2, {
+      align: 'center',
+      baseline: 'middle',
+    })
+
+    // Draw square
+    doc.rect(currentX, currentY, XSideLength, YSideLength)
+
+    // Move to the next square position
+    currentX += XSideLength
+  }
 }

@@ -6,6 +6,11 @@ import {
   moveToNewPage,
   containsArabic,
   drawFooter,
+  drawSquares,
+  drawLabeledSquares,
+  yMargin,
+  xMargin,
+  circlesStartIncrement,
 } from '@/utils/pdfUtils'
 
 export interface SeparateData {
@@ -14,6 +19,7 @@ export interface SeparateData {
   lastNumber: number
   repetitions: number
   orientation?: 'portrait' | 'landscape'
+  shape?: 'circle' | 'square'
 }
 
 export interface GroupedData extends SeparateData {
@@ -24,10 +30,6 @@ export interface Data extends GroupedData {
   isGrouped?: boolean
 }
 
-const xMargin = 20
-const yMargin = 20
-const circlesStartIncrement = 20
-
 export const generateSeparatePDF = (data: SeparateData): jsPDF => {
   const {
     title,
@@ -35,6 +37,7 @@ export const generateSeparatePDF = (data: SeparateData): jsPDF => {
     lastNumber,
     repetitions,
     orientation = 'portrait',
+    shape = 'circle',
   } = data
 
   const doc = new jsPDF({ orientation, unit: 'mm' })
@@ -56,17 +59,29 @@ export const generateSeparatePDF = (data: SeparateData): jsPDF => {
     doc.setFontSize(12)
 
     const circlesY =
-      drawCircles(
-        doc,
-        isArabic
-          ? pageWidth - xMargin - circlesStartIncrement
-          : xMargin + circlesStartIncrement,
-        y - 2,
-        circlesStartIncrement,
-        repetitions,
-        fullTitle,
-        `${i}`
-      ) + 8
+      shape === 'circle'
+        ? drawCircles(
+            doc,
+            isArabic
+              ? pageWidth - xMargin - circlesStartIncrement
+              : xMargin + circlesStartIncrement,
+            y - 2,
+            circlesStartIncrement,
+            repetitions,
+            fullTitle,
+            `${i}`
+          ) + 8
+        : drawSquares(
+            doc,
+            isArabic
+              ? pageWidth - xMargin - circlesStartIncrement
+              : xMargin + circlesStartIncrement,
+            y - 4,
+            circlesStartIncrement,
+            repetitions,
+            fullTitle,
+            `${i}`
+          ) + 8
 
     if (i < lastNumber) {
       drawThinHorizontalLine(doc, circlesY)
@@ -91,6 +106,7 @@ export const generateGroupedPDF = (data: GroupedData): jsPDF => {
     countPerGroup,
     repetitions,
     orientation = 'portrait',
+    shape = 'circle',
   } = data
 
   const doc = new jsPDF({ orientation, unit: 'mm' })
@@ -120,17 +136,29 @@ export const generateGroupedPDF = (data: GroupedData): jsPDF => {
     doc.setFontSize(12)
 
     const circlesY =
-      drawCircles(
-        doc,
-        isArabic
-          ? pageWidth - xMargin - circlesStartIncrement - extraSpace
-          : xMargin + circlesStartIncrement + extraSpace,
-        y - 2,
-        circlesStartIncrement + extraSpace,
-        repetitions,
-        fullTitle,
-        label
-      ) + 8
+      shape === 'circle'
+        ? drawCircles(
+            doc,
+            isArabic
+              ? pageWidth - xMargin - circlesStartIncrement - extraSpace
+              : xMargin + circlesStartIncrement + extraSpace,
+            y - 2,
+            circlesStartIncrement + extraSpace,
+            repetitions,
+            fullTitle,
+            label
+          ) + 8
+        : drawSquares(
+            doc,
+            isArabic
+              ? pageWidth - xMargin - circlesStartIncrement - extraSpace
+              : xMargin + circlesStartIncrement + extraSpace,
+            y - 4,
+            circlesStartIncrement + extraSpace,
+            repetitions,
+            fullTitle,
+            label
+          ) + 8
 
     if (i < total - 1) {
       drawThinHorizontalLine(doc, circlesY)
@@ -156,6 +184,7 @@ export const generatePDF = (data: Data): jsPDF => {
     countPerGroup,
     repetitions,
     orientation = 'portrait',
+    shape = 'circle',
   } = data
 
   const pdfData = {
@@ -164,6 +193,7 @@ export const generatePDF = (data: Data): jsPDF => {
     lastNumber: lastNumber,
     repetitions,
     orientation,
+    shape,
   }
 
   if (isGrouped) {
@@ -174,4 +204,20 @@ export const generatePDF = (data: Data): jsPDF => {
   }
 
   return generateSeparatePDF(pdfData)
+}
+
+export const generatePDFWithLabeledSquares = (data: Data): jsPDF => {
+  const { title, startNumber, lastNumber, orientation = 'portrait' } = data
+
+  const doc = new jsPDF({ orientation, unit: 'mm' })
+  const fullTitle = `${title}: ${startNumber} - ${lastNumber}`
+
+  drawTitle(doc, fullTitle)
+  drawFooter(doc)
+
+  const y = yMargin + 10
+
+  drawLabeledSquares(doc, xMargin, y, startNumber, lastNumber)
+
+  return doc
 }

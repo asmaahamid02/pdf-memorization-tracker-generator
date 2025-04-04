@@ -28,6 +28,7 @@ const formSchema = z
     countPerGroup: z.coerce.number().min(1),
     repetitions: z.coerce.number().min(1),
     orientation: z.enum(['portrait', 'landscape']),
+    shape: z.enum(['square', 'circle']),
   })
   .refine((data) => data.startNumber < data.lastNumber, {
     message: 'Start Number must be less than Last Number.',
@@ -45,6 +46,7 @@ const Index = () => {
       countPerGroup: 1,
       repetitions: 5,
       orientation: 'portrait',
+      shape: 'circle',
     },
   })
   const [pdfDoc, setPdfDoc] = useState<jsPDF | null>(null)
@@ -130,6 +132,17 @@ const Index = () => {
                   options={[
                     { value: 'portrait', label: 'Portrait' },
                     { value: 'landscape', label: 'Landscape' },
+                  ]}
+                />
+
+                <FormFieldComponent
+                  control={form.control}
+                  name='shape'
+                  label='Shape'
+                  type='radio'
+                  options={[
+                    { value: 'square', label: 'Square' },
+                    { value: 'circle', label: 'Circle' },
                   ]}
                 />
 
