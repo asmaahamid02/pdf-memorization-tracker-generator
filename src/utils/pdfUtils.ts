@@ -101,6 +101,7 @@ export const drawCircles = (
   let currentY = y
 
   for (let i = 0; i < count; i++) {
+    // New line
     if (i > 0 && i % circlesPerLine === 0) {
       currentX = x
       currentY += spacing
@@ -114,7 +115,7 @@ export const drawCircles = (
           align: isArabic ? 'right' : 'left',
         })
         doc.setFontSize(12)
-        currentY -= 2
+        currentY -= 2 //to balance the circles with the text
       }
     }
 

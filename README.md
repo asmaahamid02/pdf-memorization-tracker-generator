@@ -2,6 +2,10 @@
 
 This is a simple tool that generates a PDF Memorization Tracker using React and TypeScript. This tools allows users to create PDF documents that help them track their memorization progress.
 
+## Live Demo
+
+You can view the live demo of the project [here](https://pdf-memorization-tracker-generator.onrender.com).
+
 ## Technologies Used
 
 - React

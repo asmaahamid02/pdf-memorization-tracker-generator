@@ -20,9 +20,8 @@ export interface GroupedData extends SeparateData {
   countPerGroup: number
 }
 
-export interface Data extends SeparateData {
+export interface Data extends GroupedData {
   isGrouped?: boolean
-  countPerGroup: number
 }
 
 const xMargin = 20
@@ -69,7 +68,10 @@ export const generateSeparatePDF = (data: SeparateData): jsPDF => {
         `${i}`
       ) + 8
 
-    drawThinHorizontalLine(doc, circlesY)
+    if (i < lastNumber) {
+      drawThinHorizontalLine(doc, circlesY)
+    }
+
     y = circlesY + 10
 
     // Add new page if needed
@@ -130,7 +132,10 @@ export const generateGroupedPDF = (data: GroupedData): jsPDF => {
         label
       ) + 8
 
-    drawThinHorizontalLine(doc, circlesY)
+    if (i < total - 1) {
+      drawThinHorizontalLine(doc, circlesY)
+    }
+
     y = circlesY + 10
 
     // Add new page if needed
