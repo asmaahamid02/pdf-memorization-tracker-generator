@@ -1,6 +1,6 @@
 # PDF Memorization Tracker Generator
 
-This is a simple project that generates a PDF Memorization Tracker using React and TypeScript. This tools allows users to create PDF documents that help them track their memorization progress.
+This is a simple tool that generates a PDF Memorization Tracker using React and TypeScript. This tools allows users to create PDF documents that help them track their memorization progress.
 
 ## Technologies Used
 
@@ -10,6 +10,12 @@ This is a simple project that generates a PDF Memorization Tracker using React a
 - Tailwind CSS
 - [ShadCn UI](https://ui.shadcn.com/)
 - [JsPDF](https://www.npmjs.com/package/jspdf)
+- [Zod](https://zod.dev/)
+- [React Hook Form](https://react-hook-form.com/)
+
+## Demo
+
+![PDF Memorization Tracker Generator](./demo.gif)
 
 ## How to Run
 

@@ -67,88 +67,85 @@ const Index = () => {
     <Layout>
       <div className='container mx-auto grid grid-cols-1 md:grid-cols-2 gap-6'>
         {/* Form */}
-        <div className='w-full md:max-w-2xl'>
-          <Card>
-            <CardHeader>
-              <CardTitle className='text-2xl'>Generate Custom PDF</CardTitle>
-            </CardHeader>
+        <Card>
+          <CardHeader>
+            <CardTitle className='text-2xl'>Generate Custom PDF</CardTitle>
+          </CardHeader>
 
-            <CardContent>
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className='space-y-8'
-                >
-                  <FormFieldComponent
-                    control={form.control}
-                    name='title'
-                    label='Title'
-                    placeholder='Title'
-                  />
-                  <FormFieldComponent
-                    control={form.control}
-                    name='startNumber'
-                    label='Start Number'
-                    placeholder='Start Number'
-                    type='number'
-                  />
-                  <FormFieldComponent
-                    control={form.control}
-                    name='lastNumber'
-                    label='Last Number'
-                    placeholder='Last Number'
-                    type='number'
-                  />
+          <CardContent>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className='space-y-8'
+              >
+                <FormFieldComponent
+                  control={form.control}
+                  name='title'
+                  label='Title'
+                  placeholder='Title'
+                />
+                <FormFieldComponent
+                  control={form.control}
+                  name='startNumber'
+                  label='Start Number'
+                  placeholder='Start Number'
+                  type='number'
+                />
+                <FormFieldComponent
+                  control={form.control}
+                  name='lastNumber'
+                  label='Last Number'
+                  placeholder='Last Number'
+                  type='number'
+                />
 
-                  <FormFieldComponent
-                    control={form.control}
-                    name='repetitions'
-                    label='Repetitions'
-                    placeholder='Repetitions'
-                    type='number'
-                  />
+                <FormFieldComponent
+                  control={form.control}
+                  name='repetitions'
+                  label='Repetitions'
+                  placeholder='Repetitions'
+                  type='number'
+                />
 
-                  <FormFieldComponent
-                    control={form.control}
-                    name='isGrouped'
-                    label='Is Grouped'
-                    type='checkbox'
-                  />
+                <FormFieldComponent
+                  control={form.control}
+                  name='isGrouped'
+                  label='Is Grouped'
+                  type='checkbox'
+                />
 
-                  <FormFieldComponent
-                    control={form.control}
-                    name='countPerGroup'
-                    label='Count Per Group'
-                    placeholder='Count Per Group'
-                    type='number'
-                  />
+                <FormFieldComponent
+                  control={form.control}
+                  name='countPerGroup'
+                  label='Count Per Group'
+                  placeholder='Count Per Group'
+                  type='number'
+                />
 
-                  <FormFieldComponent
-                    control={form.control}
-                    name='orientation'
-                    label='Orientation'
-                    type='radio'
-                    options={[
-                      { value: 'portrait', label: 'Portrait' },
-                      { value: 'landscape', label: 'Landscape' },
-                    ]}
-                  />
+                <FormFieldComponent
+                  control={form.control}
+                  name='orientation'
+                  label='Orientation'
+                  type='radio'
+                  options={[
+                    { value: 'portrait', label: 'Portrait' },
+                    { value: 'landscape', label: 'Landscape' },
+                  ]}
+                />
 
-                  <Button type='submit'>Submit</Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-        </div>
+                <Button type='submit'>Submit</Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+
         {/* PDF Preview */}
-        <div>
-          <PDFPreview
-            pdfDoc={pdfDoc}
-            fileName={`${form.getValues('title')}-${form.getValues(
-              'startNumber'
-            )}-${form.getValues('lastNumber')}.pdf`}
-          />
-        </div>
+        <PDFPreview
+          pdfDoc={pdfDoc}
+          fileName={`${form.getValues('title')}-${form.getValues(
+            'startNumber'
+          )}-${form.getValues('lastNumber')}.pdf`}
+        />
       </div>
     </Layout>
   )
